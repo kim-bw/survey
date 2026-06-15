@@ -47,8 +47,12 @@ export default function Page() {
 
     if (!workName.trim()) return setMessage("작업명을 입력해주세요.");
     if (!workPlace.trim()) return setMessage("작업장소를 입력해주세요.");
-    if (!avgWorkMinutes || Number(avgWorkMinutes) <= 0) return setMessage("하루 평균작업시간을 입력해주세요.");
-    if (!exposureMinutes || Number(exposureMinutes) <= 0) return setMessage("예상 하루 노출시간을 입력해주세요.");
+    if (!avgWorkMinutes || Number(avgWorkMinutes) <= 0) {
+      return setMessage("하루 평균작업시간을 입력해주세요.");
+    }
+    if (!exposureMinutes || Number(exposureMinutes) <= 0) {
+      return setMessage("예상 하루 노출시간을 입력해주세요.");
+    }
 
     setItems((prev) => [
       ...prev,
@@ -71,7 +75,7 @@ export default function Page() {
   const selectNoApplicable = () => {
     setItems([]);
     setNoApplicable(true);
-    setMessage("해당없음으로 선택되었습니다.");
+    setMessage("우리팀은 폭염노출 작업이 없습니다.");
   };
 
   const submitData = async () => {
@@ -121,7 +125,7 @@ export default function Page() {
 
         <p style={styles.desc}>
           6월~9월 중 폭염에 노출될 가능성이 있는 외부작업을 등록해주세요.
-          해당 작업이 없는 경우에는 <b>해당없음</b> 버튼을 선택해주세요.
+          해당 작업이 없는 경우에는 <b>우리팀은 폭염노출 작업이 없습니다</b> 버튼을 선택해주세요.
         </p>
 
         <div style={styles.formGrid}>
@@ -164,7 +168,7 @@ export default function Page() {
           <h2 style={styles.subTitle}>등록된 작업 목록</h2>
 
           {noApplicable ? (
-            <div style={styles.emptyBox}>해당없음으로 선택됨</div>
+            <div style={styles.emptyBox}>우리팀은 폭염노출 작업이 없습니다.</div>
           ) : items.length === 0 ? (
             <div style={styles.emptyBox}>아직 추가된 작업이 없습니다.</div>
           ) : (
@@ -203,7 +207,7 @@ export default function Page() {
         <div style={styles.inputBox}>
           <h2 style={styles.subTitle}>작업 항목 추가</h2>
 
-          <div style={styles.formGrid}>
+          <div style={styles.itemInputGrid}>
             <label style={styles.label}>
               작업명
               <input
@@ -227,32 +231,40 @@ export default function Page() {
             </label>
 
             <label style={styles.label}>
-              하루 평균작업시간(분)
+              하루 평균시간
               <input
                 value={avgWorkMinutes}
                 onChange={(e) => setAvgWorkMinutes(onlyNumber(e.target.value))}
                 inputMode="numeric"
-                placeholder="양의 숫자만"
+                placeholder="분"
                 style={styles.input}
               />
             </label>
 
             <label style={styles.label}>
-              예상 하루 노출시간(분)
+              하루 노출시간
               <input
                 value={exposureMinutes}
                 onChange={(e) => setExposureMinutes(onlyNumber(e.target.value))}
                 inputMode="numeric"
-                placeholder="양의 숫자만"
+                placeholder="분"
                 style={styles.input}
               />
             </label>
+
+            <button onClick={addItem} style={styles.addBtn}>
+              + 항목 추가
+            </button>
           </div>
 
-          <div style={styles.buttonRow}>
-            <button onClick={addItem} style={styles.addBtn}>항목 추가</button>
-            <button onClick={selectNoApplicable} style={styles.noBtn}>해당없음</button>
-            <button onClick={submitData} style={styles.submitBtn}>최종제출</button>
+          <div style={styles.submitRow}>
+            <button onClick={submitData} style={styles.submitBtn}>
+              최종제출
+            </button>
+
+            <button onClick={selectNoApplicable} style={styles.noBtn}>
+              우리팀은 폭염노출 작업이 없습니다
+            </button>
           </div>
 
           {message && <p style={styles.message}>{message}</p>}
@@ -270,7 +282,7 @@ const styles: Record<string, CSSProperties> = {
     fontFamily: "Arial, sans-serif",
   },
   card: {
-    maxWidth: 1000,
+    maxWidth: 1100,
     margin: "0 auto",
     background: "#fff",
     borderRadius: 16,
@@ -291,11 +303,19 @@ const styles: Record<string, CSSProperties> = {
     gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
     gap: 16,
   },
+  itemInputGrid: {
+    display: "grid",
+    gridTemplateColumns: "2fr 2fr 120px 120px 130px",
+    gap: 12,
+    alignItems: "end",
+    overflowX: "auto",
+  },
   label: {
     display: "flex",
     flexDirection: "column",
     gap: 8,
     fontWeight: 600,
+    fontSize: 14,
   },
   input: {
     height: 42,
@@ -337,43 +357,50 @@ const styles: Record<string, CSSProperties> = {
     padding: 10,
     textAlign: "left",
     background: "#f0f0f0",
+    whiteSpace: "nowrap",
   },
   td: {
     borderBottom: "1px solid #eee",
     padding: 10,
   },
-  buttonRow: {
-    display: "flex",
-    gap: 10,
-    marginTop: 20,
-    flexWrap: "wrap",
-  },
   addBtn: {
+    height: 42,
     background: "#1976d2",
     color: "#fff",
     border: 0,
     borderRadius: 8,
-    padding: "12px 18px",
+    padding: "0 14px",
     cursor: "pointer",
     fontWeight: 700,
+    whiteSpace: "nowrap",
   },
-  noBtn: {
-    background: "#757575",
-    color: "#fff",
-    border: 0,
-    borderRadius: 8,
-    padding: "12px 18px",
-    cursor: "pointer",
-    fontWeight: 700,
+  submitRow: {
+    display: "grid",
+    gridTemplateColumns: "1fr 300px",
+    gap: 12,
+    marginTop: 28,
   },
   submitBtn: {
+    height: 58,
     background: "#2e7d32",
     color: "#fff",
     border: 0,
-    borderRadius: 8,
-    padding: "12px 18px",
+    borderRadius: 10,
+    padding: "0 24px",
     cursor: "pointer",
-    fontWeight: 700,
+    fontWeight: 800,
+    fontSize: 18,
+  },
+  noBtn: {
+    height: 58,
+    background: "#d32f2f",
+    color: "#fff",
+    border: 0,
+    borderRadius: 10,
+    padding: "0 20px",
+    cursor: "pointer",
+    fontWeight: 800,
+    fontSize: 15,
   },
   deleteBtn: {
     background: "#d32f2f",

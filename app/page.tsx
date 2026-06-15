@@ -46,10 +46,15 @@ export default function Page() {
     if (baseError) return setMessage(baseError);
 
     if (!workName.trim()) return setMessage("작업명을 입력해주세요.");
+    if (workName.trim().length > 100) return setMessage("작업명은 100글자 이내로 입력해주세요.");
+
     if (!workPlace.trim()) return setMessage("작업장소를 입력해주세요.");
+    if (workPlace.trim().length > 100) return setMessage("작업장소는 100글자 이내로 입력해주세요.");
+
     if (!avgWorkMinutes || Number(avgWorkMinutes) <= 0) {
       return setMessage("하루 평균작업시간을 입력해주세요.");
     }
+
     if (!exposureMinutes || Number(exposureMinutes) <= 0) {
       return setMessage("예상 하루 노출시간을 입력해주세요.");
     }
@@ -78,6 +83,10 @@ export default function Page() {
     setMessage("우리팀은 폭염노출 작업이 없습니다.");
   };
 
+  const removeItem = (id: number) => {
+    setItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
   const submitData = async () => {
     setMessage("");
 
@@ -85,7 +94,7 @@ export default function Page() {
     if (baseError) return setMessage(baseError);
 
     if (!noApplicable && items.length === 0) {
-      return setMessage("작업 항목을 추가하거나 해당없음을 선택해주세요.");
+      return setMessage("작업 항목을 추가하거나 우리팀은 폭염노출 작업이 없습니다 버튼을 선택해주세요.");
     }
 
     const payload = {
@@ -113,7 +122,9 @@ export default function Page() {
       body: JSON.stringify(payload),
     });
 
-    if (!res.ok) return setMessage("제출 중 오류가 발생했습니다.");
+    if (!res.ok) {
+      return setMessage("제출 중 오류가 발생했습니다.");
+    }
 
     setMessage("제출이 완료되었습니다.");
   };
@@ -172,35 +183,34 @@ export default function Page() {
           ) : items.length === 0 ? (
             <div style={styles.emptyBox}>아직 추가된 작업이 없습니다.</div>
           ) : (
-            <table style={styles.table}>
-              <thead>
-                <tr>
-                  <th style={styles.th}>작업명</th>
-                  <th style={styles.th}>작업장소</th>
-                  <th style={styles.th}>하루 평균작업시간</th>
-                  <th style={styles.th}>예상 하루 노출시간</th>
-                  <th style={styles.th}>삭제</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item) => (
-                  <tr key={item.id}>
-                    <td style={styles.td}>{item.workName}</td>
-                    <td style={styles.td}>{item.workPlace}</td>
-                    <td style={styles.td}>{item.avgWorkMinutes}분</td>
-                    <td style={styles.td}>{item.exposureMinutes}분</td>
-                    <td style={styles.td}>
-                      <button
-                        style={styles.deleteBtn}
-                        onClick={() => setItems((prev) => prev.filter((x) => x.id !== item.id))}
-                      >
-                        삭제
-                      </button>
-                    </td>
+            <div style={styles.tableWrap}>
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={styles.th}>작업명</th>
+                    <th style={styles.th}>작업장소</th>
+                    <th style={styles.th}>하루 평균작업시간</th>
+                    <th style={styles.th}>예상 하루 노출시간</th>
+                    <th style={styles.th}>삭제</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {items.map((item) => (
+                    <tr key={item.id}>
+                      <td style={styles.td}>{item.workName}</td>
+                      <td style={styles.td}>{item.workPlace}</td>
+                      <td style={styles.td}>{item.avgWorkMinutes}분</td>
+                      <td style={styles.td}>{item.exposureMinutes}분</td>
+                      <td style={styles.td}>
+                        <button style={styles.deleteBtn} onClick={() => removeItem(item.id)}>
+                          삭제
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
@@ -332,6 +342,9 @@ const styles: Record<string, CSSProperties> = {
     background: "#fafafa",
     overflowX: "auto",
   },
+  tableWrap: {
+    overflowX: "auto",
+  },
   inputBox: {
     marginTop: 24,
   },
@@ -376,12 +389,12 @@ const styles: Record<string, CSSProperties> = {
   },
   submitRow: {
     display: "grid",
-    gridTemplateColumns: "1fr 300px",
+    gridTemplateColumns: "1fr 330px",
     gap: 12,
     marginTop: 28,
   },
   submitBtn: {
-    height: 58,
+    height: 60,
     background: "#2e7d32",
     color: "#fff",
     border: 0,
@@ -389,10 +402,10 @@ const styles: Record<string, CSSProperties> = {
     padding: "0 24px",
     cursor: "pointer",
     fontWeight: 800,
-    fontSize: 18,
+    fontSize: 19,
   },
   noBtn: {
-    height: 58,
+    height: 60,
     background: "#d32f2f",
     color: "#fff",
     border: 0,
